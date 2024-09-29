@@ -1,7 +1,7 @@
 import express from 'express';
 import expressWs from "express-ws";
 import cors from 'cors';
-
+import WebSocket from 'ws';
 
 const app = express();
 expressWs(app)
@@ -12,12 +12,29 @@ app.use(cors())
 
 const router = express.Router();
 
+const userData: WebSocket[] = [];
+const fieldData: string[] = [];
 router.ws('/paint', (ws, req) => {
-    console.log('client connected');
+    userData.push(ws)
+    console.log('client connected - length' , userData.length);
 
+    fieldData.forEach((message) => {
+        ws.send(message);
+    });
+
+    ws.on('message' , (message:string) => {
+
+        fieldData.push(message);
+
+        userData.forEach((clientWs) => {
+            clientWs.send(message)
+        })
+    })
 
     ws.on('close' , () => {
         console.log('disconnect')
+        const index = userData.indexOf(ws)
+        userData.splice(index , 1)
     })
 });
 
