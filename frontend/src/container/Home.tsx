@@ -7,12 +7,14 @@ const Home = () => {
         y: number;
         lastX: number;
         lastY: number;
+        color: string;
     }
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [isActive, setIsActive] = useState(false);
     const [lastPosition, setLastPosition] = useState({x: 0, y: 0});
     const [pixels, setPixels] = useState<PosProps[]>([]);
+    const [color, setColor] = useState('#000000');
 
     const ws = useRef<WebSocket | null>(null);
 
@@ -47,8 +49,9 @@ const Home = () => {
 
         canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
-        pixels.forEach(({ x, y, lastX, lastY }) => {
+        pixels.forEach(({ x, y, lastX, lastY, color }) => {
             canvasContext.beginPath();
+            canvasContext.strokeStyle = color;
             canvasContext.moveTo(lastX, lastY);
             canvasContext.lineTo(x, y);
             canvasContext.stroke();
@@ -69,6 +72,7 @@ const Home = () => {
                 y: offsetY,
                 lastX: lastPosition.x,
                 lastY: lastPosition.y,
+                color,
             };
 
             if ("send" in ws.current) {
@@ -87,21 +91,32 @@ const Home = () => {
     return (
 
         <div style={{display:'flex', flexDirection:'column', marginTop:'50px'}}>
-            <canvas
-                ref={canvasRef}
-                width={800}
-                height={600}
-                style={{border: '1px solid black', backgroundColor: 'white'}}
-                onMouseDown={draw}
-                onMouseMove={draw}
-                onMouseUp={draw}
-                onMouseLeave={draw}
-            />
-            {ws.current && (
-                <div>
-                    <div>Connected</div>
+            <div style={{display:'flex'}}>
+                <canvas
+                    ref={canvasRef}
+                    width={800}
+                    height={600}
+                    style={{border: '1px solid black', backgroundColor: 'white'}}
+                    onMouseDown={draw}
+                    onMouseMove={draw}
+                    onMouseUp={draw}
+                    onMouseLeave={draw}
+                />
+                <div style={{marginLeft:'50px'}}>
+                    {ws.current && (
+                        <div>
+                            <div>Вы подключены</div>
+                        </div>
+                    )}
+                    <h1>Выбрать цвет линии</h1>
+                    <input
+                        type="color"
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        style={{marginBottom: '20px', width:'200px'}}
+                    />
                 </div>
-            )}
+            </div>
         </div>
     );
 };
