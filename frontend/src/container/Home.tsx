@@ -14,6 +14,28 @@ const Home = () => {
     const [lastPosition, setLastPosition] = useState({x: 0, y: 0});
     const [pixels, setPixels] = useState<PosProps[]>([]);
 
+    const ws = useRef<WebSocket | null>(null);
+
+
+    useEffect(() => {
+        ws.current = new WebSocket('ws://localhost:8000/paint');
+
+        if ("onmessage" in ws.current) {
+            ws.current.onmessage = (message) => {
+                const decodedMessage = JSON.parse(message.data)
+
+                if (decodedMessage.type === 'pixel') {
+                    setPixels((prevPixels) => [...prevPixels, decodedMessage.data]);
+                }
+            };
+        }
+
+        return () => {
+            ws.current?.close();
+        };
+    }, []);
+
+
     useEffect(() => {
         const canvas = canvasRef.current;
 
@@ -49,7 +71,11 @@ const Home = () => {
                 lastY: lastPosition.y,
             };
 
-            setPixels((pixel) => [...pixel, pixelPosData]);
+            if ("send" in ws.current) {
+                ws.current.send(JSON.stringify({type: 'pixel', data: pixelPosData}));
+            }
+
+            setPixels((pixelPos) => [...pixelPos, pixelPosData]);
             setLastPosition({ x: offsetX, y: offsetY });
         }
 
@@ -71,6 +97,11 @@ const Home = () => {
                 onMouseUp={draw}
                 onMouseLeave={draw}
             />
+            {ws.current && (
+                <div>
+                    <div>Connected</div>
+                </div>
+            )}
         </div>
     );
 };

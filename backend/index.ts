@@ -16,14 +16,12 @@ const userData: WebSocket[] = [];
 const fieldData: string[] = [];
 router.ws('/paint', (ws, req) => {
     userData.push(ws)
-    console.log('client connected - length' , userData.length);
 
     fieldData.forEach((message) => {
         ws.send(message);
     });
 
     ws.on('message' , (message:string) => {
-
         fieldData.push(message);
 
         userData.forEach((clientWs) => {
@@ -32,7 +30,6 @@ router.ws('/paint', (ws, req) => {
     })
 
     ws.on('close' , () => {
-        console.log('disconnect')
         const index = userData.indexOf(ws)
         userData.splice(index , 1)
     })
