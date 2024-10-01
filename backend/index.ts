@@ -22,11 +22,22 @@ router.ws('/paint', (ws, req) => {
     });
 
     ws.on('message' , (message:string) => {
-        fieldData.push(message);
+        const msg = JSON.parse(message);
 
-        userData.forEach((clientWs) => {
-            clientWs.send(message)
-        })
+        if (msg.type === 'pixel') {
+            fieldData.push(message);
+
+            userData.forEach((clientWs) => {
+                clientWs.send(message)
+            })
+        }
+        if(msg.type === 'clear'){
+            fieldData.length = 0;
+
+            userData.forEach((clientWs) => {
+                clientWs.send(JSON.stringify({type:'clear'}))
+            })
+        }
     })
 
     ws.on('close' , () => {

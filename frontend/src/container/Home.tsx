@@ -29,8 +29,13 @@ const Home = () => {
                 if (decodedMessage.type === 'pixel') {
                     setPixels((prevPixels) => [...prevPixels, decodedMessage.data]);
                 }
+
+                if (decodedMessage.type === 'clear') {
+                    setPixels([]);
+                }
             };
         }
+
 
         return () => {
             ws.current?.close();
@@ -87,6 +92,11 @@ const Home = () => {
             setIsActive(false);
         }
     };
+    const clearField = () => {
+        if ("send" in ws.current) {
+            ws.current.send(JSON.stringify({type: 'clear'}));
+        }
+    }
 
     return (
 
@@ -115,6 +125,7 @@ const Home = () => {
                         onChange={(e) => setColor(e.target.value)}
                         style={{marginBottom: '20px', width:'200px'}}
                     />
+                    <button onClick={clearField}>Clear</button>
                 </div>
             </div>
         </div>
