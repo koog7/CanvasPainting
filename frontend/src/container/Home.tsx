@@ -118,14 +118,19 @@ const Home = () => {
                             <div>Вы подключены</div>
                         </div>
                     )}
-                    <h1>Выбрать цвет линии</h1>
-                    <input
-                        type="color"
-                        value={color}
-                        onChange={(e) => setColor(e.target.value)}
-                        style={{marginBottom: '20px', width:'200px'}}
-                    />
-                    <button onClick={clearField}>Clear</button>
+                    <div>
+                        <h1>Выбрать цвет линии</h1>
+                        <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => setColor(e.target.value)}
+                            style={{marginBottom: '20px', width: '200px'}}
+                        />
+                    </div>
+                    <div style={{marginTop:'50px'}}>
+                        <h2>Очистить холст</h2>
+                        <button onClick={clearField}>Clear</button>
+                    </div>
                 </div>
             </div>
         </div>
